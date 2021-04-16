@@ -8,45 +8,63 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Main {
-    static int population_size = 5;
-    static ArrayList<BufferedImage> population = new ArrayList<>(population_size);
+    private static int population_size = 5;
+    private static ArrayList<BufferedImage> population = new ArrayList<>(population_size);
 
     public static void main(String[] args) throws IOException {
         String input = "head.jpg";
         String white_input = "white.jpg"; //white image
         BufferedImage inputPicture = ImageIO.read(new File(input));
         BufferedImage whitePicture = ImageIO.read(new File(white_input));
-//        BufferedImage reWhitePicture = resize(whitePicture, 512, 512);
         for (int i = 0; i < population_size; i++) {
             population.add(whitePicture);
         }
         int generations = 0;
-        int minFitness = 100;
-//        JLabel picLabel = new JLabel(new ImageIcon(population.get(3)));
-//        JPanel jPanel = new JPanel();
-//        jPanel.add(picLabel);
-//        JFrame f = new JFrame();
-//        f.setSize(new Dimension(inputPicture.getWidth(), inputPicture.getHeight()));
-//        f.add(jPanel);
-//        f.setVisible(true);
-//        for (int i = 0; i < population.size(); i++) {
-//            mutation(population.get((i)), inputPicture);
-//        }
-//        for (int i = 0; i < population.size(); i++) {
-//            JLabel picLabel = new JLabel(new ImageIcon(population.get(i)));
-//            JPanel jPanel = new JPanel();
-//            jPanel.add(picLabel);
-//            JFrame f = new JFrame();
-//            f.setSize(new Dimension(inputPicture.getWidth(), inputPicture.getHeight()));
-//            f.add(jPanel);
-//            f.setVisible(true);
-//        }
-
-
+        int maxFitness = 40;
+        BufferedImage answer = selection(generations, maxFitness, inputPicture);
+        JLabel picLabel = new JLabel(new ImageIcon(answer));
+        JPanel jPanel = new JPanel();
+        jPanel.add(picLabel);
+        JFrame f = new JFrame();
+        f.setSize(new Dimension(inputPicture.getWidth(), inputPicture.getHeight()));
+        f.add(jPanel);
+        f.setVisible(true);
     }
 
-    public static float fitness(BufferedImage image, BufferedImage input) {
-        float percentage = 0;
+    public static BufferedImage selection(int generation, int maxFitness, BufferedImage input) {
+        while (generation != 500) {
+            generation += 1;
+            for (int i = 0; i < population.size() / 2; i++) {
+                int k = (int) (Math.random() * (population.size() - 2));
+                mutation(population.get(k), input);
+            }
+            for (int m = 0; m < population.size() / 4; m++) {
+                int k = (int) (Math.random() * (population.size() - 2));
+                int l = (int) (Math.random() * (population.size() - 2));
+                crossover(population.get(k), population.get(l));
+            }
+            for (int p = 0; p < population.size() / 3; p++) {
+                if (fitness(population.get(p), input) > maxFitness) {
+                    population.remove(population.get(p));
+                }
+                maxFitness--;
+            }
+        }
+
+        int minimal = 35;
+        int minimal_id = 0;
+        for (int i = 0; i < population.size(); i++) {
+            if (fitness(population.get(i), input) < minimal) {
+                minimal = fitness(population.get(i), input);
+                minimal_id = i;
+            }
+        }
+
+        return population.get(minimal_id);
+    }
+
+    public static int fitness(BufferedImage image, BufferedImage input) {
+        int percentage = 0;
         // take buffer data from both image files //
         DataBuffer dbA = image.getData().getDataBuffer();
         int sizeA = dbA.getSize();
@@ -59,7 +77,6 @@ public class Main {
                     count = count + 1;
                 }
             }
-            System.out.println(count);
             percentage = (count * 100) / sizeA;
         }
         return percentage;
