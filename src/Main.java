@@ -7,6 +7,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * @author Dariya Vakhitova
+ */
 public class Main {
     private static int population_size = 5;
     private static ArrayList<BufferedImage> population = new ArrayList<>(population_size);
@@ -31,6 +34,9 @@ public class Main {
         f.setVisible(true);
     }
 
+    /**
+     * Function selects the best entities from population using fitness function. Mutation and crossover done at this stage also
+     */
     public static BufferedImage selection(int generation, int maxFitness, BufferedImage input) {
         while (generation != 500) {
             generation += 1;
@@ -63,9 +69,11 @@ public class Main {
         return population.get(minimal_id);
     }
 
+    /**
+     * Faction determines the difference between two images. It compares each bit in both image.
+     */
     public static int fitness(BufferedImage image, BufferedImage input) {
         int percentage = 0;
-        // take buffer data from both image files //
         DataBuffer dbA = image.getData().getDataBuffer();
         int sizeA = dbA.getSize();
         DataBuffer dbB = input.getData().getDataBuffer();
@@ -82,7 +90,9 @@ public class Main {
         return percentage;
     }
 
-
+    /**
+     * Image mutates by adding text on random color at random place in picture
+     */
     public static void mutation(BufferedImage image, BufferedImage input) {
         Font font = new Font("Oswald", Font.ITALIC, 10);
         Graphics g = image.getGraphics();
@@ -96,6 +106,9 @@ public class Main {
         }
     }
 
+    /**
+     * Two images perform crossover, the result is new image which is added to population
+     */
     public static void crossover(BufferedImage base, BufferedImage overlay) {
         try {
             BufferedImage copyOfImage =
